@@ -3,7 +3,7 @@
   "displayName": "Prototyper",
   "description": "Compile, test & debug** code snippets seamlessly inside VSCode!\n\n** - Coming Soon!",
   "version": "0.0.1",
-  "publisher": "pwdev",
+  "publisher": "pwalkerdev",
   "engines": {
     "vscode": "^1.85.0"
   },
