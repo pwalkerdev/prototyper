@@ -10,8 +10,10 @@ function onEvaluateCSharp() {
 	const terminal = vscode.window.terminals.find(t => t.name === 'Headless Dotnet Script') ?? vscode.window.createTerminal({ name: 'Headless Dotnet Script', isTransient: true });
 	if (!editor || !terminal) { return; }
 
-	const extensionFolder = vscode.extensions.getExtension('pwdev.prototyper')?.extensionPath ?? '';
-	const myAppPath = vscode.Uri.file(path.join(extensionFolder, '.modules', 'Headless', 'HeadlessNetCore', 'bin', 'Debug', 'net8.0', 'HeadlessNetCore.dll'));
+	const extensionFolder = vscode.extensions.getExtension('pwalkerdev.prototyper')?.extensionPath ?? '';
+	const myAppPath = process.env.IsDebugInstance === 'true'
+		? vscode.Uri.file(path.join(extensionFolder, '.modules', 'Headless', 'HeadlessNetCore', 'bin', 'Debug', 'net8.0', 'HeadlessNetCore.dll'))
+		: vscode.Uri.file(path.join(extensionFolder, 'dist', 'HeadlessNetCore', 'HeadlessNetCore.dll'));
 	const token = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => (Math.random() * 16 | (c === 'x' ? 0 : 0 & 0x3 | 0x8)).toString(16));
 	const execCommand = `dotnet "${myAppPath.fsPath}" stream "${token}"`;
 
