@@ -1,6 +1,6 @@
-# prototyper README
+# prototyper
 
-This is the README for your extension "prototyper". After writing up a brief description, we recommend including the following sections.
+Compile and run whatever is in the currently selected editor! As long as it is valid C#... (Support for more languages coming soon 😅)
 
 ## Features
 
@@ -31,6 +31,10 @@ This extension contributes the following settings:
 
 Calling out known issues can help limit users opening duplicate issues against your extension.
 
+## Packaging
+
+If you want to build the extension locally and install it into VSCode, you will need to package it using the `vsce` tool. First install it via npm with: `npm install -g @vscode/vsce`. Then you can build and pack the VSIX file using: `vsce pack --out ./release/prototyper.x.x.x.vsix --yarn --pre-release`. Once done, you can install the extension into VSCode by opening up the extensions tab, clicking the context menu button, and selecting the option to install VSIX.
+
 ## Release Notes
 
 Users appreciate release notes as you update your extension.
@@ -46,26 +50,3 @@ Fixed issue #.
 ### 1.1.0
 
 Added features X, Y, and Z.
-
----
-
-## Following extension guidelines
-
-Ensure that you've read through the extensions guidelines and follow the best practices for creating your extension.
-
-* [Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
-
-## Working with Markdown
-
-You can author your README using Visual Studio Code. Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux).
-* Toggle preview (`Shift+Cmd+V` on macOS or `Shift+Ctrl+V` on Windows and Linux).
-* Press `Ctrl+Space` (Windows, Linux, macOS) to see a list of Markdown snippets.
-
-## For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
