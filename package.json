@@ -1,14 +1,15 @@
 {
   "name": "prototyper",
   "displayName": "Prototyper",
-  "description": "Compile, test & debug* code snippets seamlessly inside VSCode!\r\n\r\n* - Coming Soon!",
+  "description": "Compile, test & debug* code snippets seamlessly inside VSCode!\r\n\r\n*Coming Soon!",
   "version": "0.0.1",
   "publisher": "pwalkerdev",
+  "icon": "./dist/logo/pt-logo.png",
   "engines": {
     "vscode": "^1.85.0"
   },
   "categories": [
-    "Other"
+    "Debuggers"
   ],
   "activationEvents": [],
   "main": "./dist/extension.js",
