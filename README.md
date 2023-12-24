@@ -2,6 +2,8 @@
 
 Compile and run whatever is in the currently selected editor! As long as it is valid C#... (Support for more languages coming soon 😅)
 
+[<img src="src/images/conventional-example.gif" width="600" height="420" alt="Prototyper Demo" />](src/images/conventional-example.gif)
+
 - [Prototyper - GitHub](https://github.com/pwalkerdev/prototyper)
 - [Headless - GitHub](https://github.com/pwalkerdev/Headless)
 
@@ -12,12 +14,12 @@ Build & run your script seamlessly from within VSCode - no project, scaffolding 
 For .NET, run command: `Prototyper: Evaluate C# Script`. The code in the currently opened editor will then be compiled and evaluated. The output will be shown in the terminal.
 **NOTE:** Currently .NET code can only contain a single main method which will be the assumed entry point, although local/nested methods are supported. The method can be implemented conventionally or with expression body (lambda) syntax. For example:
 
-```
+```csharp
 // expression body
 () => 5 + 10
 ```
 
-```
+```csharp
 // conventional
 int MyScript()
 {
@@ -26,13 +28,9 @@ int MyScript()
 }
 ```
 
-\!\[Method Body\]\(src/images/expression-body-example.gif\)
-
-\!\[Expression Body\]\(src/images/expression-body-example.gif\)
-
 ## Requirements
 
-- [.NET SDK](https://dotnet.microsoft.com/en-us/download/dotnet)
+- [.NET SDK](https://dotnet.microsoft.com/en-us/download/dotnet) Used to compile C# scripts. Must be .NET or .NET core - .NET framework is currently unsupported.
 - [Headless](https://github.com/pwalkerdev/Headless) Is a framework for interpreting and executing code. Headless is bundled with the prototyper VSCode extension by default, and the source code is required when running the extension locally. When cloning this repository, make sure to fetch all sub-modules and you will be able to find it in `./modules/Headless`
 
 ## Extension Settings
