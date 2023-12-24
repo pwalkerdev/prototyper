@@ -2,34 +2,46 @@
 
 Compile and run whatever is in the currently selected editor! As long as it is valid C#... (Support for more languages coming soon 😅)
 
+- [Prototyper - GitHub](https://github.com/pwalkerdev/prototyper)
+- [Headless - GitHub](https://github.com/pwalkerdev/Headless)
+
 ## Features
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+Build & run your script seamlessly from within VSCode - no project, scaffolding or setup required.
 
-For example if there is an image subfolder under your extension project workspace:
+For .NET, run command: `Prototyper: Evaluate C# Script`. The code in the currently opened editor will then be compiled and evaluated. The output will be shown in the terminal.
+**NOTE:** Currently .NET code can only contain a single main method which will be the assumed entry point, although local/nested methods are supported. The method can be implemented conventionally or with expression body (lambda) syntax. For example:
 
-\!\[feature X\]\(images/feature-x.png\)
+```
+// expression body
+() => 5 + 10
+```
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+```
+// conventional
+int MyScript()
+{
+    "Hello World!".Dump(); // LinqPad inspired extension method .Dump() can be invoked to get output from a unit of work
+    return 5 + 10;
+}
+```
+
+\!\[Method Body\]\(src/images/expression-body-example.gif\)
+
+\!\[Expression Body\]\(src/images/expression-body-example.gif\)
 
 ## Requirements
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+- [.NET SDK](https://dotnet.microsoft.com/en-us/download/dotnet)
+- [Headless](https://github.com/pwalkerdev/Headless) Is a framework for interpreting and executing code. Headless is bundled with the prototyper VSCode extension by default, and the source code is required when running the extension locally. When cloning this repository, make sure to fetch all sub-modules and you will be able to find it in `./modules/Headless`
 
 ## Extension Settings
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
-
-For example:
-
-This extension contributes the following settings:
-
-* `myExtension.enable`: Enable/disable this extension.
-* `myExtension.thing`: Set to `blah` to do something.
+Currently there are no settings, configuration options will be added in soon.
 
 ## Known Issues
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
+- If you call `sendText()` on a VSCode terminal immediately after creating it, it may not 'receive' the text which can cause problems, given how headless is desingned. This is to say, that you need to wait until the new terminal is 'ready' to receive input. I could not find a reliable method of verifying that the terminal instance is initialised, not for lack of trying. So, currently the code just delays the execution of headless for a short period of time. If anyone knows a better way to do this please let me know!
 
 ## Packaging
 
@@ -37,16 +49,7 @@ If you want to build the extension locally and install it into VSCode, you will 
 
 ## Release Notes
 
-Users appreciate release notes as you update your extension.
+### 0.0.1
 
-### 1.0.0
-
-Initial release of ...
-
-### 1.0.1
-
-Fixed issue #.
-
-### 1.1.0
-
-Added features X, Y, and Z.
+Initial release of prototyper! This project is in it's infancy and very much still a work in progress. The current release contains little more than the bare minimum. Only C# is supported and scripts cannot be run concurently. Scripts must be written in a specific way (see notes above) to be interpreted correctly by headless.  
+All of this will be improved upon in future iterations.
