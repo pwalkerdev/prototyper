@@ -1,9 +1,5 @@
 # Change Log
 
-All notable changes to the "prototyper" extension will be documented in this file.
+## [0.0.1] - Initial release
 
-Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
-
-## [Unreleased]
-
-- Initial release
+Very basic implementation with little to no configurability and only support for C# .NET core applications
