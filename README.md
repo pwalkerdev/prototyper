@@ -51,3 +51,7 @@ If you want to build the extension locally and install it into VSCode, you will 
 
 Initial release of prototyper! This project is in it's infancy and very much still a work in progress. The current release contains little more than the bare minimum. Only C# is supported and scripts cannot be run concurently. Scripts must be written in a specific way (see notes above) to be interpreted correctly by headless.  
 All of this will be improved upon in future iterations.
+
+## License
+
+This project is licensed under the GNU GPLv3 License - see the LICENSE.md file for details
