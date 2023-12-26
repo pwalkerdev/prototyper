@@ -1,8 +1,10 @@
 # prototyper
 
-Compile and run whatever is in the currently selected editor! As long as it is valid C#... (Support for more languages coming soon 😅)
+Compile and run whatever is in the currently selected editor!
 
 [<img src="src/images/conventional-example.gif" width="600" height="420" alt="Prototyper Demo" />](src/images/conventional-example.gif)
+
+Curently only C# is supported. JavaScript and other languages will be added in future releases, once they are supported by Headless.
 
 - [Prototyper - GitHub](https://github.com/pwalkerdev/prototyper)
 - [Headless - GitHub](https://github.com/pwalkerdev/Headless)
@@ -43,7 +45,11 @@ Currently there are no settings, configuration options will be added in soon.
 
 ## Packaging
 
-If you want to build the extension locally and install it into VSCode, you will need to package it using the `vsce` tool. First install it via npm with: `npm install -g @vscode/vsce`. Then you can build and pack the VSIX file using: `vsce pack --out ./release/prototyper.x.x.x.vsix --yarn --pre-release`. Once done, you can install the extension into VSCode by opening up the extensions tab, clicking the context menu button, and selecting the option to install VSIX.
+If you want to build the extension VSIX locally and install it into VSCode, you will need to package it using the `vsce` tool. First install it via npm with: `npm install -g @vscode/vsce`. Then you can build and pack the VSIX file using: `vsce pack --out ./release/prototyper.x.x.x.vsix --yarn --pre-release`. Once done, you can install the extension into VSCode by opening up the extensions tab, clicking the context menu button, and selecting the option to install VSIX.
+
+Also note that the `dist` folder must contain a subfolder called `HeadlessNetCore` which houses the Headless compiled assemblies. At this point in time, building the submodule and copying it to this folder must be done manually before running the `vsce pack` command.
+
+To compile the Headless submodule, you will need to run: `dotnet publish -f net8.0 -c Release` from the `./modules/Headless/HeadlessNetCore.` folder.
 
 ## Release Notes
 
@@ -55,3 +61,9 @@ All of this will be improved upon in future iterations.
 ## License
 
 This project is licensed under the GNU GPLv3 License - see the LICENSE.md file for details
+
+---
+  
+<p align="center">
+  Written by Paul Walker - github.com/pwalkerdev
+</p>
