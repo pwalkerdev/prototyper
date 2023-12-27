@@ -53,6 +53,10 @@ To compile the Headless submodule, you will need to run: `dotnet publish -f net8
 
 ## Release Notes
 
+### 0.0.2
+
+No functional changes, just small modifications to the readme.
+
 ### 0.0.1
 
 Initial release of prototyper! This project is in it's infancy and very much still a work in progress. The current release contains little more than the bare minimum. Only C# is supported and scripts cannot be run concurently. Scripts must be written in a specific way (see notes above) to be interpreted correctly by headless.  
