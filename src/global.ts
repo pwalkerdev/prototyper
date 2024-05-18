@@ -8,9 +8,9 @@ export class instance {
 }
 
 export class headless {
-    private static readonly _searchPath: string[] = instance.isDebug ? ['.modules', 'Headless', 'HeadlessNetCore', 'bin', 'Debug', 'net8.0'] : ['dist', 'HeadlessNetCore'];
+    private static readonly _searchPath: string[] = instance.isDebug ? ['.modules', 'Headless', 'Headless', 'bin', 'Debug', 'net8.0'] : ['dist', 'bin'];
 
-    static readonly netCoreModule: vscode.Uri = vscode.Uri.file(path.join(instance.installationFolder, ...this._searchPath, 'HeadlessNetCore.dll'));
+    static readonly netCoreModule: vscode.Uri = vscode.Uri.file(path.join(instance.installationFolder, ...this._searchPath, 'Headless.exe'));
 }
 
 export class uuid {
