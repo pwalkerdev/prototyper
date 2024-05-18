@@ -47,11 +47,17 @@ Currently there are no settings, configuration options will be added in soon.
 
 If you want to build the extension VSIX locally and install it into VSCode, you will need to package it using the `vsce` tool. First install it via npm with: `npm install -g @vscode/vsce`. Then you can build and pack the VSIX file using: `vsce pack --out ./release/prototyper.x.x.x.vsix --yarn --pre-release`. Once done, you can install the extension into VSCode by opening up the extensions tab, clicking the context menu button, and selecting the option to install VSIX.
 
-Also note that the `dist` folder must contain a subfolder called `HeadlessNetCore` which houses the Headless compiled assemblies. At this point in time, building the submodule and copying it to this folder must be done manually before running the `vsce pack` command.
+Also note that the `dist` folder must contain a subfolder called `bin` which houses the Headless compiled assemblies. At this point in time, building the submodule and copying it to this folder must be done manually before running the `vsce pack` command.
 
-To compile the Headless submodule, you will need to run: `dotnet publish -f net8.0 -c Release` from the `./modules/Headless/HeadlessNetCore.` folder.
+To compile the Headless submodule, you will need to run: `dotnet publish -f net8.0 -c Release` from the `./modules/Headless/Headless.` folder.
 
 ## Release Notes
+
+### 0.0.3
+
+- Update Headless back-end to latest version.
+- Add new VSCode command to evaluate JavaScript
+- Add new "auto" command which will evaluate based on the editor's currently selected language
 
 ### 0.0.2
 
