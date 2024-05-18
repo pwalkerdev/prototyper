@@ -2,7 +2,7 @@
   "name": "prototyper",
   "displayName": "Prototyper",
   "description": "Compile, test & debug* code snippets seamlessly inside VSCode!\r\n\r\n*Coming Soon!",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "publisher": "pwalkerdev",
   "icon": "./dist/logo/pt-logo.png",
   "engines": {
@@ -16,8 +16,16 @@
   "contributes": {
     "commands": [
       {
+        "command": "extension.prototyper.evaluate",
+        "title": "Prototyper: Evaluate"
+      },
+      {
         "command": "extension.prototyper.evaluatecsharp",
-        "title": "Prototyper: Evaluate C# Script"
+        "title": "Prototyper: Evaluate C#"
+      },
+      {
+        "command": "extension.prototyper.evaluatejs",
+        "title": "Prototyper: Evaluate JavaScript"
       }
     ]
   },

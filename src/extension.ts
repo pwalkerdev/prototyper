@@ -2,20 +2,22 @@ import * as vscode from 'vscode';
 import { headless, instance, uuid, prototerminal } from './global';
 
 export function activate(context: vscode.ExtensionContext) {
-    context.subscriptions.push(vscode.commands.registerCommand('extension.prototyper.evaluatecsharp', () => EvaluateEntryPoint(RunCSharpHeadless)));
+    context.subscriptions.push(vscode.commands.registerCommand('extension.prototyper.evaluate', () => Evaluate()));
+	context.subscriptions.push(vscode.commands.registerCommand('extension.prototyper.evaluatecsharp', () => Evaluate("CSharp")));
+	context.subscriptions.push(vscode.commands.registerCommand('extension.prototyper.evaluatejs', () => Evaluate("JavaScript")));
 }
 
-function EvaluateEntryPoint(callback: (editor: vscode.TextEditor, terminal: vscode.Terminal | undefined) => void): void {
+function Evaluate(languageOverride: string | undefined = undefined): void {
 	if (vscode.window.activeTextEditor) {
-		callback(vscode.window.activeTextEditor, vscode.window.terminals.find(t => t.name === prototerminal.name));
+		RunHeadless(languageOverride, vscode.window.activeTextEditor, vscode.window.terminals.find(t => t.name === prototerminal.name));
 	}
 }
 
-function RunCSharpHeadless(editor: vscode.TextEditor, terminal: vscode.Terminal | undefined): void {
+function RunHeadless(languageOverride: string | undefined, editor: vscode.TextEditor, terminal: vscode.Terminal | undefined): void {
 	const executionDelay = terminal ? 0 : instance.terminalInitialisationDelay, // HACK: This is pretty crappy but if we create a new terminal then we have to wait until it is ready. I couldn't find a 'proper' way to do this
 		  token = uuid.new();
 	
-	(terminal ??= vscode.window.createTerminal(prototerminal.options)).sendText(`dotnet "${headless.netCoreModule.fsPath}" stream "${token}"`);
+	(terminal ??= vscode.window.createTerminal(prototerminal.options)).sendText(`cmd.exe /c "${headless.Location}" -l ${languageOverride ?? editor.document.languageId} -i stream -t "${token}"`);
 
 	setTimeout(() => {
 		terminal!.sendText(''); // the empty line here serves no purpose - i just think it looks prettier
