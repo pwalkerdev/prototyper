@@ -15,7 +15,7 @@ function RunCSharpHeadless(editor: vscode.TextEditor, terminal: vscode.Terminal 
 	const executionDelay = terminal ? 0 : instance.terminalInitialisationDelay, // HACK: This is pretty crappy but if we create a new terminal then we have to wait until it is ready. I couldn't find a 'proper' way to do this
 		  token = uuid.new();
 	
-	(terminal ??= vscode.window.createTerminal(prototerminal.options)).sendText(`cmd.exe /c "${headless.netCoreModule.fsPath}" -l CSharp -i stream -t "${token}"`);
+	(terminal ??= vscode.window.createTerminal(prototerminal.options)).sendText(`cmd.exe /c "${headless.Location}" -l CSharp -i stream -t "${token}"`);
 
 	setTimeout(() => {
 		terminal!.sendText(''); // the empty line here serves no purpose - i just think it looks prettier
