@@ -55,7 +55,9 @@ To compile the Headless submodule, you will need to run: `dotnet publish -f net8
 
 ### 0.0.3
 
-Update Headless back-end to latest version.
+- Update Headless back-end to latest version.
+- Add new VSCode command to evaluate JavaScript
+- Add new "auto" command which will evaluate based on the editor's currently selected language
 
 ### 0.0.2
 

@@ -16,8 +16,16 @@
   "contributes": {
     "commands": [
       {
+        "command": "extension.prototyper.evaluate",
+        "title": "Prototyper: Evaluate"
+      },
+      {
         "command": "extension.prototyper.evaluatecsharp",
-        "title": "Prototyper: Evaluate C# Script"
+        "title": "Prototyper: Evaluate C#"
+      },
+      {
+        "command": "extension.prototyper.evaluatejs",
+        "title": "Prototyper: Evaluate JavaScript"
       }
     ]
   },
