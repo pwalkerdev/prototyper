@@ -19,7 +19,7 @@ export class headless {
         requireExactSource: false,
         justMyCode: true,
         processName: "Headless.exe",
-        stopAtEntry: true,
+        //stopAtEntry: true,
         // symbolOptions: {
         //     searchMicrosoftSymbolServer: true, // TODO: Maybe parameterise this?
         //     moduleFilter: {
