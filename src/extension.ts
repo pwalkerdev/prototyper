@@ -58,26 +58,22 @@ export function activate(context: vscode.ExtensionContext) {
 }
 
 function Evaluate(languageOverride: string): void {
-    if (vscode.window.activeTextEditor) {
-        RunHeadless(languageOverride, vscode.window.activeTextEditor, vscode.window.terminals.find(t => t.name === prototerminal.name));
-    }
-}
-
-function RunHeadless(languageOverride: string, editor: vscode.TextEditor, terminal: vscode.Terminal | undefined): void {
-    const executionDelay = terminal ? 0 : instance.terminalInitialisationDelay, // HACK: This is pretty crappy but if we create a new terminal then we have to wait until it is ready. I couldn't find a 'proper' way to do this
-          token = uuid.new();
+    const document = vscode.window.activeTextEditor?.document;
+    if (document) {
+        const token = uuid.new(),
+              delay = instance.determineTerminalInitialisationDelay(prototerminal.name), // HACK: This is pretty crappy but if we create a new terminal then we have to wait until it is ready. I couldn't find a 'proper' way to do this
+              terminal = vscode.window.terminals.find(t => t.name === prototerminal.name) ?? vscode.window.createTerminal(prototerminal.options);
     
-    (terminal ??= vscode.window.createTerminal(prototerminal.options)).sendText(`cmd.exe /c "${headless.location}" -l ${languageOverride ?? editor.document.languageId} -i stream -t "${token}"`);
+        terminal.sendText(`cmd.exe /c "${headless.location}" -l ${languageOverride ?? document.languageId} -i stream -t "${token}"`);
 
-    setTimeout(() => {
-        terminal!.sendText(''); // the empty line here serves no purpose - i just think it looks prettier
-        for (var i = 0; i < editor.document.lineCount; i++) {
-            terminal!.sendText(editor.document.lineAt(i).text);
-        }
-        terminal!.sendText(token); // Resending the token indicates to the script interpreter that there is no more to send
-    }, executionDelay);
+        setTimeout(() => {
+            terminal.sendText(''); // the empty line here serves no purpose - i just think it looks prettier
+            terminal.sendText(document.getText());
+            terminal.sendText(token); // Resending the token indicates to the script interpreter that there is no more to send
+        }, delay);
 
-    terminal.show(true);
+        terminal.show(true);
+    }
 }
 
 function Debug(language: string): void {
@@ -87,7 +83,9 @@ function Debug(language: string): void {
 
     const document = vscode.window.activeTextEditor?.document;
     if (document) {
-        const token = uuid.new(), terminal = vscode.window.terminals.find(t => t.name === prototerminal.name) ?? vscode.window.createTerminal(prototerminal.options);
+        const token = uuid.new(),
+              delay = instance.determineTerminalInitialisationDelay(prototerminal.name), // HACK: This is pretty crappy but if we create a new terminal then we have to wait until it is ready. I couldn't find a 'proper' way to do this
+              terminal = vscode.window.terminals.find(t => t.name === prototerminal.name) ?? vscode.window.createTerminal(prototerminal.options);
 
         let sourceFileUri = document.uri;
         if (document.uri.scheme === 'untitled') {
@@ -99,10 +97,11 @@ function Debug(language: string): void {
             terminal.sendText(`cmd.exe /c "${headless.location}" -l ${language} -m Debug -i stream -t "${token}" --cs-file-name "${editor.document.uri.toString(true).replace('prototypewriter:/', 'prototypewriter:///')}"`);
 
             setTimeout(() => {
-                vscode.debug.startDebugging(undefined, headless.debugConfiguration, undefined);
-                terminal.sendText(document.getText());
-                terminal.sendText(token); // Resending the token indicates to the script interpreter that there is no more to send
-            }, instance.terminalInitialisationDelay);
+                vscode.debug.startDebugging(undefined, headless.debugConfiguration, undefined).then(_ => {
+                    terminal.sendText(document.getText());
+                    terminal.sendText(token); // Resending the token indicates to the script interpreter that there is no more to send 
+                });
+            }, delay);
         
             terminal.show(true);
         });
