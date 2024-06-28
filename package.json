@@ -34,11 +34,11 @@
       "commandPalette": [
         {
           "command": "extension.prototyper.evaluatecsharp",
-          "when": "editorLangId == csharp || (editorLangId != javascript && editorLangId != typescript)"
+          "when": "editorLangId == csharp || editorLangId != javascript"
         },
         {
           "command": "extension.prototyper.evaluatejs",
-          "when": "editorLangId == javascript || editorLangId == typescript || editorLangId != csharp"
+          "when": "editorLangId == javascript || editorLangId != csharp"
         },
         {
           "command": "extension.prototyper.debugcsharp",
