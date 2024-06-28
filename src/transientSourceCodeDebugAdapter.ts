@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import { DebugProtocol } from '@vscode/debugprotocol';
 
 class TransientSourceCodeDebugAdapter implements vscode.DebugAdapter {
 
@@ -12,7 +13,7 @@ class TransientSourceCodeDebugAdapter implements vscode.DebugAdapter {
         const request = <any>message;
         switch (request.type) {
             case 'request':
-                //const request = <DebugProtocol.Request>message;
+                const request = <DebugProtocol.Request>message;
                 switch (request.command) {
                     case 'initialize':
                         const response: any = {
