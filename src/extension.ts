@@ -2,9 +2,6 @@ import * as vscode from 'vscode';
 import { headless, instance, uuid, prototerminal } from './global';
 //import { TransientSourceCodeDebugAdapterFactory } from './transientSourceCodeDebugAdapter';
 import { MemFS } from './fileSystemProvider';
-//import { Breakpoint, BreakpointEvent, Source, LoggingDebugSession } from '@vscode/debugadapter';
-//import { DebugProtocol } from '@vscode/debugprotocol';
-
 
 export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(vscode.workspace.registerFileSystemProvider('prototypewriter', new MemFS(), { isCaseSensitive: true }));
@@ -12,15 +9,6 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(vscode.commands.registerCommand('extension.prototyper.evaluatecsharp', () => Evaluate("CSharp")));
     context.subscriptions.push(vscode.commands.registerCommand('extension.prototyper.evaluatejs', () => Evaluate("JavaScript")));
     context.subscriptions.push(vscode.commands.registerCommand('extension.prototyper.debugcsharp', () => Debug("CSharp")));
-
-    // context.subscriptions.push(vscode.debug.onDidStartDebugSession(session => { 
-    //     let loggingSession = session as unknown as LoggingDebugSession;
-    //     if (!loggingSession) {
-    //         return;
-    //     }
-    //     let bp = new Breakpoint(true, 1, 1, new Source(session.name, 'Untitled-1.cs')) as DebugProtocol.Breakpoint;
-    //     loggingSession.sendEvent(new BreakpointEvent('new', bp));
-    // }));
 
     //const transientSourceCodeDebuggerAdapterFactory = new TransientSourceCodeDebugAdapterFactory();
     //const factoryRef = vscode.debug.registerDebugAdapterDescriptorFactory('prototyper-csharp', transientSourceCodeDebuggerAdapterFactory)
@@ -30,11 +18,20 @@ export function activate(context: vscode.ExtensionContext) {
     //     { language: "csharp" },
     //     {
     //         provideDocumentLinks(document, token) {
-    //             return [new vscode.DocumentLink(
-    //                 new vscode.Range(new vscode.Position(3, 4), new vscode.Position(3, 4)),
-    //                 vscode.Uri.from({ scheme: 'untitled', path: 'Untitled-1' })
-    //               )];
+    //             if (!token.isCancellationRequested && document.uri.scheme === 'prototypewriter') {
+    //                 return [new vscode.DocumentLink(
+    //                     new vscode.Range(new vscode.Position(0, 0), new vscode.Position(0, 0)),
+    //                     vscode.Uri.from({ scheme: 'prototypewriter', path: '/Untitled-1.cs' })
+    //                   )];
+    //             }
+    //             return null;
     //         },
+    //         resolveDocumentLink(link, token) {
+    //             if (link.target?.scheme === 'prototypewriter') {
+    //                 console.log('sssa');
+    //             }
+    //             return null;
+    //         }
     //     }
     //   );
 
@@ -95,6 +92,11 @@ function Debug(language: string): void {
 
         vscode.window.showTextDocument(sourceFileUri, { preview: false }).then(editor => {
             terminal.sendText(`cmd.exe /c "${headless.location}" -l ${language} -m Debug -i stream -t "${token}" --cs-file-name "${editor.document.uri.toString(true).replace('prototypewriter:/', 'prototypewriter:///')}"`);
+
+            // this will create a breakpoint at the very top of the script, could be useful because the stop at entry property does not work when attaching to a running process...
+            // if (!vscode.debug.breakpoints.find(bp => bp instanceof vscode.SourceBreakpoint && bp.location.range.toString() === '[2:0, 2:0]')) {
+            //     vscode.debug.addBreakpoints([new vscode.SourceBreakpoint(new vscode.Location(editor.document.uri, new vscode.Position(0, 0)), true)]);
+            // }
 
             setTimeout(() => {
                 vscode.debug.startDebugging(undefined, headless.debugConfiguration, undefined).then(_ => {

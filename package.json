@@ -16,6 +16,11 @@
   ],
   "main": "./dist/extension.js",
   "contributes": {
+    "breakpoints": [
+      {
+        "language": "csharp"
+      }
+    ],
     "commands": [
       {
         "command": "extension.prototyper.evaluatecsharp",
