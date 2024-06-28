@@ -12,7 +12,7 @@
     "Debuggers"
   ],
   "activationEvents": [
-    "onFileSystem:prototypervfs"
+    "onFileSystem:prototypewriter"
   ],
   "main": "./dist/extension.js",
   "contributes": {
