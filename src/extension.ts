@@ -2,17 +2,16 @@ import * as vscode from 'vscode';
 import { headless, instance, uuid, prototerminal } from './global';
 //import { TransientSourceCodeDebugAdapterFactory } from './transientSourceCodeDebugAdapter';
 import { MemFS } from './fileSystemProvider';
-import { Breakpoint, BreakpointEvent, Source, LoggingDebugSession } from '@vscode/debugadapter';
-import { DebugProtocol } from '@vscode/debugprotocol';
+//import { Breakpoint, BreakpointEvent, Source, LoggingDebugSession } from '@vscode/debugadapter';
+//import { DebugProtocol } from '@vscode/debugprotocol';
 
 
 export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(vscode.workspace.registerFileSystemProvider('prototypervfs', new MemFS(), { isCaseSensitive: true }));
 
-    context.subscriptions.push(vscode.commands.registerCommand('extension.prototyper.evaluate', () => Evaluate()));
     context.subscriptions.push(vscode.commands.registerCommand('extension.prototyper.evaluatecsharp', () => Evaluate("CSharp")));
     context.subscriptions.push(vscode.commands.registerCommand('extension.prototyper.evaluatejs', () => Evaluate("JavaScript")));
-    context.subscriptions.push(vscode.commands.registerCommand('extension.prototyper.debugcsharp', () => DebugHeadless()));
+    context.subscriptions.push(vscode.commands.registerCommand('extension.prototyper.debugcsharp', () => Debug("CSharp")));
 
     // context.subscriptions.push(vscode.debug.onDidStartDebugSession(session => { 
     //     let loggingSession = session as unknown as LoggingDebugSession;
@@ -58,13 +57,13 @@ export function activate(context: vscode.ExtensionContext) {
     // );
 }
 
-function Evaluate(languageOverride: string | undefined = undefined): void {
+function Evaluate(languageOverride: string): void {
     if (vscode.window.activeTextEditor) {
         RunHeadless(languageOverride, vscode.window.activeTextEditor, vscode.window.terminals.find(t => t.name === prototerminal.name));
     }
 }
 
-function RunHeadless(languageOverride: string | undefined, editor: vscode.TextEditor, terminal: vscode.Terminal | undefined): void {
+function RunHeadless(languageOverride: string, editor: vscode.TextEditor, terminal: vscode.Terminal | undefined): void {
     const executionDelay = terminal ? 0 : instance.terminalInitialisationDelay, // HACK: This is pretty crappy but if we create a new terminal then we have to wait until it is ready. I couldn't find a 'proper' way to do this
           token = uuid.new();
     
@@ -81,24 +80,29 @@ function RunHeadless(languageOverride: string | undefined, editor: vscode.TextEd
     terminal.show(true);
 }
 
-function DebugHeadless(): void {
-    if (vscode.window.activeTextEditor) {
+function Debug(language: string): void {
+    if (language?.toLowerCase() !== 'csharp') {
+        throw new Error(`Debugging is not currently supported for requested language: ${language}`);
+    }
+
+    const document = vscode.window.activeTextEditor?.document;
+    if (document) {
         const token = uuid.new(), terminal = vscode.window.terminals.find(t => t.name === prototerminal.name) ?? vscode.window.createTerminal(prototerminal.options);
 
-        //let documentUri = vscode.Uri.parse(`prototypervfs:/${token}.cs`);
-        let documentUri = vscode.Uri.parse(`prototypervfs:/Untitled-1.cs`);
-        vscode.workspace.fs.writeFile(documentUri, Buffer.from(vscode.window.activeTextEditor!.document.getText()));
-        vscode.window.showTextDocument(documentUri, { preview: false }).then(doc => {
-            terminal.sendText(`cmd.exe /c "${headless.location}" -l CSharp -m Debug -i stream -t "${token}"`);
+        let sourceFileUri = document.uri;
+        if (document.uri.scheme === 'untitled') {
+            sourceFileUri = sourceFileUri.with({ scheme: 'prototypervfs', path: `/${sourceFileUri.path}.cs` });
+            vscode.workspace.fs.writeFile(sourceFileUri, Buffer.from(document.getText()));
+        }
+
+        vscode.window.showTextDocument(sourceFileUri, { preview: false }).then(editor => {
+            terminal.sendText(`cmd.exe /c "${headless.location}" -l ${language} -m Debug -i stream -t "${token}" --cs-file-name "${editor.document.uri.toString(true).replace('prototypervfs:/', 'prototypervfs:///')}"`);
 
             setTimeout(() => {
                 vscode.debug.startDebugging(undefined, headless.debugConfiguration, undefined);
-                //terminal!.sendText(''); // the empty line here serves no purpose - i just think it looks prettier
-                for (var i = 0; i < doc.document.lineCount; i++) {
-                    terminal!.sendText(doc.document.lineAt(i).text);
-                }
-                terminal!.sendText(token); // Resending the token indicates to the script interpreter that there is no more to send
-            }, 2000);
+                terminal.sendText(document.getText());
+                terminal.sendText(token); // Resending the token indicates to the script interpreter that there is no more to send
+            }, instance.terminalInitialisationDelay);
         
             terminal.show(true);
         });
