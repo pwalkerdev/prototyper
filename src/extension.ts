@@ -7,7 +7,7 @@ import { MemFS } from './fileSystemProvider';
 
 
 export function activate(context: vscode.ExtensionContext) {
-    context.subscriptions.push(vscode.workspace.registerFileSystemProvider('prototypervfs', new MemFS(), { isCaseSensitive: true }));
+    context.subscriptions.push(vscode.workspace.registerFileSystemProvider('prototypewriter', new MemFS(), { isCaseSensitive: true }));
 
     context.subscriptions.push(vscode.commands.registerCommand('extension.prototyper.evaluatecsharp', () => Evaluate("CSharp")));
     context.subscriptions.push(vscode.commands.registerCommand('extension.prototyper.evaluatejs', () => Evaluate("JavaScript")));
@@ -91,12 +91,12 @@ function Debug(language: string): void {
 
         let sourceFileUri = document.uri;
         if (document.uri.scheme === 'untitled') {
-            sourceFileUri = sourceFileUri.with({ scheme: 'prototypervfs', path: `/${sourceFileUri.path}.cs` });
+            sourceFileUri = sourceFileUri.with({ scheme: 'prototypewriter', path: `/${sourceFileUri.path}.cs` });
             vscode.workspace.fs.writeFile(sourceFileUri, Buffer.from(document.getText()));
         }
 
         vscode.window.showTextDocument(sourceFileUri, { preview: false }).then(editor => {
-            terminal.sendText(`cmd.exe /c "${headless.location}" -l ${language} -m Debug -i stream -t "${token}" --cs-file-name "${editor.document.uri.toString(true).replace('prototypervfs:/', 'prototypervfs:///')}"`);
+            terminal.sendText(`cmd.exe /c "${headless.location}" -l ${language} -m Debug -i stream -t "${token}" --cs-file-name "${editor.document.uri.toString(true).replace('prototypewriter:/', 'prototypewriter:///')}"`);
 
             setTimeout(() => {
                 vscode.debug.startDebugging(undefined, headless.debugConfiguration, undefined);
