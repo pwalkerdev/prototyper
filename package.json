@@ -18,22 +18,34 @@
   "contributes": {
     "commands": [
       {
-        "command": "extension.prototyper.evaluate",
-        "title": "Prototyper: Evaluate"
-      },
-      {
         "command": "extension.prototyper.evaluatecsharp",
         "title": "Prototyper: Evaluate C#"
       },
       {
         "command": "extension.prototyper.evaluatejs",
-        "title": "Prototyper: Evaluate JavaScript"
+        "title": "Prototyper: Evaluate JS / TS"
       },
       {
         "command": "extension.prototyper.debugcsharp",
         "title": "Prototyper: Debug C#"
       }
-    ]
+    ],
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "extension.prototyper.evaluatecsharp",
+          "when": "editorLangId == csharp || (editorLangId != javascript && editorLangId != typescript)"
+        },
+        {
+          "command": "extension.prototyper.evaluatejs",
+          "when": "editorLangId == javascript || editorLangId == typescript || editorLangId != csharp"
+        },
+        {
+          "command": "extension.prototyper.debugcsharp",
+          "when": "editorLangId == csharp && !inDebugMode"
+        }
+      ]
+    }
   },
   "repository": {
     "type": "git",
