@@ -28,7 +28,7 @@
             "type": "coreclr",
             "request": "launch",
             "program": "${workspaceFolder}${/}.modules${/}Headless${/}Headless${/}bin${/}Debug${/}net8.0${/}Headless.dll",
-            "args": ["-m", "Debug", "-l", "CSharp", "-i", "stream", "-t", "asdf"],
+            "args": ["-l", "CSharp", "-m", "Debug", "-i", "stream", "-t", "asdf", "--cs-impl-scheme", "Method", "--cs-file-name", "prototypewriter:/Untitled-1.cs"],
             "cwd": "${workspaceFolder}${/}.modules${/}Headless${/}Headless",
             "console": "integratedTerminal",
             "stopAtEntry": false
