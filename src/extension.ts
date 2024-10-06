@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { headless, instance, uuid, prototerminal } from './global';
-//import { TransientSourceCodeDebugAdapterFactory } from './transientSourceCodeDebugAdapter';
+// import { TransientSourceCodeDebugAdapterFactory } from './transientSourceCodeDebugAdapter';
 import { MemFS } from './fileSystemProvider';
 
 export function activate(context: vscode.ExtensionContext) {
@@ -10,30 +10,55 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(vscode.commands.registerCommand('extension.prototyper.evaluatejs', () => Evaluate("JavaScript")));
     context.subscriptions.push(vscode.commands.registerCommand('extension.prototyper.debugcsharp', () => Debug("CSharp")));
 
-    //const transientSourceCodeDebuggerAdapterFactory = new TransientSourceCodeDebugAdapterFactory();
-    //const factoryRef = vscode.debug.registerDebugAdapterDescriptorFactory('prototyper-csharp', transientSourceCodeDebuggerAdapterFactory)
-    //context.subscriptions.push(factoryRef);
+    context.subscriptions.push(
+        vscode.window.registerTerminalLinkProvider({
+            provideTerminalLinks: (context, token) => {
+            const regex = /prototypewriter:((\/?\/?\/)|(\\?\\?\\))[-a-zA-Z0-9@:%._\+\\~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+\\.~#?&//]*)((=| )?[0-9]*)/;
+            const matches = (context.line as string)?.match(regex);
 
-    // vscode.languages.registerDocumentLinkProvider(
-    //     { language: "csharp" },
-    //     {
-    //         provideDocumentLinks(document, token) {
-    //             if (!token.isCancellationRequested && document.uri.scheme === 'prototypewriter') {
-    //                 return [new vscode.DocumentLink(
-    //                     new vscode.Range(new vscode.Position(0, 0), new vscode.Position(0, 0)),
-    //                     vscode.Uri.from({ scheme: 'prototypewriter', path: '/Untitled-1.cs' })
-    //                   )];
-    //             }
-    //             return null;
-    //         },
-    //         resolveDocumentLink(link, token) {
-    //             if (link.target?.scheme === 'prototypewriter') {
-    //                 console.log('sssa');
-    //             }
-    //             return null;
+            return !!matches?.index 
+                ? matches
+                    .filter((m: any) => { return !!m?.startsWith('prototypewriter'); })
+                    .map((m: any) => {
+                        return {
+                            startIndex: matches.index!,
+                            length: m.length,
+                            tooltip: 'Show in editor',
+                            target: m
+                        };
+                    })
+                : [];
+            },
+            handleTerminalLink: (link: any) => {
+                // TODO: This currently only supports .cs files because that's all we need for now
+                let segments = link.target.split(':');
+                let line = segments.length === 3 ? parseInt(segments[2].split(' ').pop().split('=').pop()) - 1 : segments[2] ?? 0;
+                vscode.window.showTextDocument(vscode.Uri.from({ scheme:  segments[0], path: segments[1]}), { preview: false, selection: new vscode.Selection(new vscode.Position(line, 0), new vscode.Position(line, 0)) });
+            }
+        })
+    );
+
+    // const transientSourceCodeDebuggerAdapterFactory = new TransientSourceCodeDebugAdapterFactory();
+    // const factoryRef = vscode.debug.registerDebugAdapterDescriptorFactory('prototyper-csharp', transientSourceCodeDebuggerAdapterFactory)
+    // context.subscriptions.push(factoryRef);
+
+    // vscode.languages.registerDocumentLinkProvider({ language: "csharp" }, {
+    //     provideDocumentLinks(document, token) {
+    //         if (!token.isCancellationRequested && document.uri.scheme === 'prototypewriter') {
+    //             return [new vscode.DocumentLink(
+    //                 new vscode.Range(new vscode.Position(0, 0), new vscode.Position(0, 0)),
+    //                 vscode.Uri.from({ scheme: 'prototypewriter', path: '/Untitled-1.cs' })
+    //             )];
     //         }
+    //         return null;
+    //     },
+    //     resolveDocumentLink(link, token) {
+    //         if (link.target?.scheme === 'prototypewriter') {
+    //             console.log('sssa');
+    //         }
+    //         return null;
     //     }
-    //   );
+    // });
 
     // vscode.debug.registerDebugAdapterTrackerFactory('coreclr', {
     //     createDebugAdapterTracker(session: vscode.DebugSession) {
@@ -49,9 +74,8 @@ export function activate(context: vscode.ExtensionContext) {
     //                 }
     //             },
     //         };
-    //       }
-    //   }
-    // );
+    //     }
+    // });
 }
 
 function Evaluate(languageOverride: string): void {
