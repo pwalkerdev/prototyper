@@ -14,8 +14,38 @@
 			},
 			"group": {
 				"kind": "build",
-				"isDefault": true
 			}
+		},
+		{
+			"label": "Rebuild Headless",
+			"type": "shell",
+			"command": "dotnet build -f net8.0 -c Debug",
+			"options": {
+				"cwd": "${workspaceFolder}${pathSeparator}.modules${pathSeparator}Headless"
+			},
+			"group": {
+				"kind": "build",
+			},
+			"presentation": {
+				"echo": true,
+				"reveal": "always",
+				"showReuseMessage": false,
+				"close": true
+			},
+			"problemMatcher": [],
+		},
+		{
+			"label": "task: build",
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"dependsOn": [
+				"npm: watch",
+				"Rebuild Headless"
+			],
+			"dependsOrder": "parallel",
+			"problemMatcher": []
 		},
 		{
 			"type": "npm",
