@@ -1,31 +1,136 @@
 import * as vscode from 'vscode';
 import { headless, instance, uuid, prototerminal } from './global';
+// import { TransientSourceCodeDebugAdapterFactory } from './transientSourceCodeDebugAdapter';
+import { MemFS } from './fileSystemProvider';
 
 export function activate(context: vscode.ExtensionContext) {
-    context.subscriptions.push(vscode.commands.registerCommand('extension.prototyper.evaluate', () => Evaluate()));
-	context.subscriptions.push(vscode.commands.registerCommand('extension.prototyper.evaluatecsharp', () => Evaluate("CSharp")));
-	context.subscriptions.push(vscode.commands.registerCommand('extension.prototyper.evaluatejs', () => Evaluate("JavaScript")));
+    context.subscriptions.push(vscode.workspace.registerFileSystemProvider('prototypewriter', new MemFS(), { isCaseSensitive: true }));
+
+    context.subscriptions.push(vscode.commands.registerCommand('extension.prototyper.evaluatecsharp', () => Evaluate("CSharp")));
+    context.subscriptions.push(vscode.commands.registerCommand('extension.prototyper.evaluatejs', () => Evaluate("JavaScript")));
+    context.subscriptions.push(vscode.commands.registerCommand('extension.prototyper.debugcsharp', () => Debug("CSharp")));
+
+    context.subscriptions.push(
+        vscode.window.registerTerminalLinkProvider({
+            provideTerminalLinks: (context, token) => {
+            const regex = /prototypewriter:((\/?\/?\/)|(\\?\\?\\))[-a-zA-Z0-9@:%._\+\\~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+\\.~#?&//]*)((=| )?[0-9]*)/;
+            const matches = (context.line as string)?.match(regex);
+
+            return !!matches?.index 
+                ? matches
+                    .filter((m: any) => { return !!m?.startsWith('prototypewriter'); })
+                    .map((m: any) => {
+                        return {
+                            startIndex: matches.index!,
+                            length: m.length,
+                            tooltip: 'Show in editor',
+                            target: m
+                        };
+                    })
+                : [];
+            },
+            handleTerminalLink: (link: any) => {
+                // TODO: This currently only supports .cs files because that's all we need for now
+                let segments = link.target.split(':');
+                let line = segments.length === 3 ? parseInt(segments[2].split(' ').pop().split('=').pop()) - 1 : segments[2] ?? 0;
+                vscode.window.showTextDocument(vscode.Uri.from({ scheme:  segments[0], path: segments[1]}), { preview: false, selection: new vscode.Selection(new vscode.Position(line, 0), new vscode.Position(line, 0)) });
+            }
+        })
+    );
+
+    // const transientSourceCodeDebuggerAdapterFactory = new TransientSourceCodeDebugAdapterFactory();
+    // const factoryRef = vscode.debug.registerDebugAdapterDescriptorFactory('prototyper-csharp', transientSourceCodeDebuggerAdapterFactory)
+    // context.subscriptions.push(factoryRef);
+
+    // vscode.languages.registerDocumentLinkProvider({ language: "csharp" }, {
+    //     provideDocumentLinks(document, token) {
+    //         if (!token.isCancellationRequested && document.uri.scheme === 'prototypewriter') {
+    //             return [new vscode.DocumentLink(
+    //                 new vscode.Range(new vscode.Position(0, 0), new vscode.Position(0, 0)),
+    //                 vscode.Uri.from({ scheme: 'prototypewriter', path: '/Untitled-1.cs' })
+    //             )];
+    //         }
+    //         return null;
+    //     },
+    //     resolveDocumentLink(link, token) {
+    //         if (link.target?.scheme === 'prototypewriter') {
+    //             console.log('sssa');
+    //         }
+    //         return null;
+    //     }
+    // });
+
+    // vscode.debug.registerDebugAdapterTrackerFactory('coreclr', {
+    //     createDebugAdapterTracker(session: vscode.DebugSession) {
+    //         return {
+    //             onWillReceiveMessage: m => {
+    //                 if (m.command === 'source') {
+    //                     console.log(`> ${JSON.stringify(m, undefined, 2)}`);
+    //                 }
+    //             },
+    //             onDidSendMessage: m => {
+    //                 if (m.command === 'source') {
+    //                     console.log(`> ${JSON.stringify(m, undefined, 2)}`);
+    //                 }
+    //             },
+    //         };
+    //     }
+    // });
 }
 
-function Evaluate(languageOverride: string | undefined = undefined): void {
-	if (vscode.window.activeTextEditor) {
-		RunHeadless(languageOverride, vscode.window.activeTextEditor, vscode.window.terminals.find(t => t.name === prototerminal.name));
-	}
+function Evaluate(languageOverride: string): void {
+    const document = vscode.window.activeTextEditor?.document;
+    if (document) {
+        const token = uuid.new(),
+              delay = instance.determineTerminalInitialisationDelay(prototerminal.name), // HACK: This is pretty crappy but if we create a new terminal then we have to wait until it is ready. I couldn't find a 'proper' way to do this
+              terminal = vscode.window.terminals.find(t => t.name === prototerminal.name) ?? vscode.window.createTerminal(prototerminal.options);
+        
+        // TODO: the addition of the --cs-impl-scheme param is a hack because I plan to improve the C# compiler and remove this later. The JS compiler will ignore this param
+        terminal.sendText(`cmd.exe /c "${headless.location}" -l ${languageOverride ?? document.languageId} -i stream -t "${token}" --cs-impl-scheme Method`);
+
+        setTimeout(() => {
+            terminal.sendText(''); // the empty line here serves no purpose - i just think it looks prettier
+            terminal.sendText(document.getText());
+            terminal.sendText(token); // Resending the token indicates to the script interpreter that there is no more to send
+        }, delay);
+
+        terminal.show(true);
+    }
 }
 
-function RunHeadless(languageOverride: string | undefined, editor: vscode.TextEditor, terminal: vscode.Terminal | undefined): void {
-	const executionDelay = terminal ? 0 : instance.terminalInitialisationDelay, // HACK: This is pretty crappy but if we create a new terminal then we have to wait until it is ready. I couldn't find a 'proper' way to do this
-		  token = uuid.new();
-	
-	(terminal ??= vscode.window.createTerminal(prototerminal.options)).sendText(`cmd.exe /c "${headless.Location}" -l ${languageOverride ?? editor.document.languageId} -i stream -t "${token}"`);
+function Debug(language: string): void {
+    if (language?.toLowerCase() !== 'csharp') {
+        throw new Error(`Debugging is not currently supported for requested language: ${language}`);
+    }
 
-	setTimeout(() => {
-		terminal!.sendText(''); // the empty line here serves no purpose - i just think it looks prettier
-		for (var i = 0; i < editor.document.lineCount; i++) {
-			terminal!.sendText(editor.document.lineAt(i).text);
-		}
-		terminal!.sendText(token); // Resending the token indicates to the script interpreter that there is no more to send
-	}, executionDelay);
+    const document = vscode.window.activeTextEditor?.document;
+    if (document) {
+        const token = uuid.new(),
+              delay = instance.determineTerminalInitialisationDelay(prototerminal.name), // HACK: This is pretty crappy but if we create a new terminal then we have to wait until it is ready. I couldn't find a 'proper' way to do this
+              terminal = vscode.window.terminals.find(t => t.name === prototerminal.name) ?? vscode.window.createTerminal(prototerminal.options);
 
-	terminal.show(true);
+        let sourceFileUri = document.uri;
+        if (document.uri.scheme === 'untitled') {
+            sourceFileUri = sourceFileUri.with({ scheme: 'prototypewriter', path: `/${sourceFileUri.path}.cs` });
+            vscode.workspace.fs.writeFile(sourceFileUri, Buffer.from(document.getText()));
+        }
+
+        vscode.window.showTextDocument(sourceFileUri, { preview: false }).then(editor => {
+            terminal.sendText(`cmd.exe /c "${headless.location}" -l ${language} -m Debug -i stream -t "${token}" --cs-impl-scheme Method --cs-file-name "${editor.document.uri.toString(true)}"`);
+
+            // this will create a breakpoint at the very top of the script, could be useful because the stop at entry property does not work when attaching to a running process...
+            if (!vscode.debug.breakpoints.find(bp => bp instanceof vscode.SourceBreakpoint && bp.location.range.toString() === '[2:0, 2:0]')) {
+                vscode.debug.addBreakpoints([new vscode.SourceBreakpoint(new vscode.Location(editor.document.uri, new vscode.Position(0, 0)), true)]);
+            }
+
+            setTimeout(() => {
+                vscode.debug.startDebugging(undefined, headless.debugConfiguration, undefined).then(_ => {
+                    terminal.sendText(document.getText());
+                    terminal.sendText(token); // Resending the token indicates to the script interpreter that there is no more to send 
+                });
+            }, delay);
+        
+            terminal.show(true);
+        });
+    }
 }
