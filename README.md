@@ -53,9 +53,16 @@ To compile the Headless submodule, you will need to run: `dotnet publish -f net8
 
 ## Release Notes
 
+### 0.0.4
+
+- Update Headless back-end to latest version [more info](https://github.com/pwalkerdev/Headless/pull/4)
+- Implement new command providing support for debugging C# scripts
+- Evaluate/debug commands now only appear in command palette when the target language matches the what is selected in the active editor
+- Various performance and quality of life improvements
+
 ### 0.0.3
 
-- Update Headless back-end to latest version.
+- Update Headless back-end to latest version [more info](https://github.com/pwalkerdev/Headless/pull/2)
 - Add new VSCode command to evaluate JavaScript
 - Add new "auto" command which will evaluate based on the editor's currently selected language
 
