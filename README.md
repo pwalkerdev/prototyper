@@ -53,6 +53,10 @@ To compile the Headless submodule, you will need to run: `dotnet publish -f net8
 
 ## Release Notes
 
+### 0.0.5
+
+Functionally same as version 0.0.4 but resolving an issue with the marketplace release
+
 ### 0.0.4
 
 - Update Headless back-end to latest version [more info](https://github.com/pwalkerdev/Headless/pull/4)
