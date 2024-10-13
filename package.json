@@ -2,7 +2,7 @@
   "name": "prototyper",
   "displayName": "Prototyper",
   "description": "Compile, test & debug code snippets seamlessly inside VSCode!",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "publisher": "pwalkerdev",
   "icon": "./dist/logo/pt-logo.png",
   "engines": {
