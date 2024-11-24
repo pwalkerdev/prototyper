@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import { headless, instance, uuid, prototerminal } from './global';
 // import { TransientSourceCodeDebugAdapterFactory } from './transientSourceCodeDebugAdapter';
 import { MemFS } from './fileSystemProvider';
+import { ConsoleViewProvider } from './consoleViewProvider';
 
 export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(vscode.workspace.registerFileSystemProvider('prototypewriter', new MemFS(), { isCaseSensitive: true }));
@@ -37,6 +38,9 @@ export function activate(context: vscode.ExtensionContext) {
             }
         })
     );
+
+    const provider = new ConsoleViewProvider(context.extensionUri);
+    context.subscriptions.push(vscode.window.registerWebviewViewProvider(ConsoleViewProvider.viewType, provider));
 
     // const transientSourceCodeDebuggerAdapterFactory = new TransientSourceCodeDebugAdapterFactory();
     // const factoryRef = vscode.debug.registerDebugAdapterDescriptorFactory('prototyper-csharp', transientSourceCodeDebuggerAdapterFactory)

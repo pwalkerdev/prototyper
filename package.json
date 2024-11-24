@@ -9,7 +9,12 @@
     "vscode": "^1.85.0"
   },
   "categories": [
-    "Debuggers"
+    "Debuggers",
+    "Notebooks"
+  ],
+  "extensionKind": [
+    "ui",
+    "workspace"
   ],
   "activationEvents": [
     "onFileSystem:prototypewriter"
@@ -50,6 +55,24 @@
           "when": "editorLangId == csharp && !inDebugMode"
         }
       ]
+    },
+    "viewsContainers": {
+      "panel": [
+        {
+          "id": "prototyper-console",
+          "title": "Prototyper",
+          "icon": ""
+        }
+      ]
+    },
+    "views": {
+      "prototyper-console": [
+        {
+          "type": "webview",
+          "id": "prototyper.console",
+          "name": "Prototyper"
+        }
+      ]
     }
   },
   "repository": {
@@ -77,7 +100,9 @@
     "@typescript-eslint/parser": "^6.13.1",
     "@vscode/test-cli": "^0.0.4",
     "@vscode/test-electron": "^2.3.8",
+    "css-loader": "^7.1.2",
     "eslint": "^8.54.0",
+    "style-loader": "^4.0.0",
     "ts-loader": "^9.5.1",
     "typescript": "^5.3.2",
     "webpack": "^5.89.0",

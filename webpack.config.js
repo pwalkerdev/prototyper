@@ -24,19 +24,18 @@ const extensionConfig = {
     // modules added here also need to be added in the .vscodeignore file
   },
   resolve: {
-    // support reading TypeScript and JavaScript files, 📖 -> https://github.com/TypeStrong/ts-loader
-    extensions: ['.ts', '.js']
+    extensions: ['.ts', '.js', '.css']
   },
   module: {
     rules: [
       {
         test: /\.ts$/,
         exclude: /node_modules/,
-        use: [
-          {
-            loader: 'ts-loader'
-          }
-        ]
+        use: ['ts-loader']
+      },
+      {
+        test: /\.css$/i,
+        use: ['style-loader', 'css-loader'],
       }
     ]
   },
@@ -45,4 +44,33 @@ const extensionConfig = {
     level: "log", // enables logging required for problem matchers
   },
 };
-module.exports = [ extensionConfig ];
+/** @type WebpackConfig */
+const consoleConfig = {
+	mode: 'none',
+  entry: './src/console/console.js',
+  output: {
+    path: path.resolve(__dirname, 'dist'),
+    filename: 'console.js',
+    libraryTarget: 'global'
+  },
+  resolve: {
+    extensions: ['.js', '.css']
+  },
+  module: {
+    rules: [
+      {
+        test: /\.js$/,
+        exclude: /node_modules/,
+      },
+      {
+        test: /\.css$/i,
+        use: ['style-loader', 'css-loader'],
+      }
+    ]
+  },
+  devtool: 'nosources-source-map',
+  infrastructureLogging: {
+    level: "log",
+  },
+};
+module.exports = [ extensionConfig, consoleConfig ];

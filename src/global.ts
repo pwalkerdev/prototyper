@@ -37,6 +37,10 @@ export class uuid {
     static new(): string { return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => (Math.random() * 16 | (c === 'x' ? 0 : 0 & 0x3 | 0x8)).toString(16)); }
 }
 
+export class nonce {
+    static new(): string { return 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'.replace(/[xy]/g, c => (Math.random() * 16 | 0).toString(16)); }
+}
+
 export class prototerminal {
     static readonly name: string = 'Headless Dotnet Script';
     static readonly welcomeMessage: string = 'Prototyper: Initialising Terminal Instance...\r\n';
@@ -45,6 +49,6 @@ export class prototerminal {
         name: this.name,
         message: this.welcomeMessage,
         isTransient: true, // TODO: Make this configurable in case user wants to keep history
-        cwd: vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders?.length > 0 ? vscode.workspace.workspaceFolders![0].uri : undefined
+        cwd: vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders?.length > 0 ? vscode.workspace.workspaceFolders![0].uri : undefined,
     };
 }
