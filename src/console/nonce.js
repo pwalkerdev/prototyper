@@ -1,1 +1,0 @@
-__webpack_nonce__ = [].filter.call(document.getElementsByTagName('script'), e => !!e.nonce)[0].nonce;

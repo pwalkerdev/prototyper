@@ -34,7 +34,7 @@ const extensionConfig = {
         use: ['ts-loader']
       },
       {
-        test: /\.css$/i,
+        test: /\.css$/,
         use: ['style-loader', 'css-loader'],
       }
     ]
@@ -47,11 +47,18 @@ const extensionConfig = {
 /** @type WebpackConfig */
 const consoleConfig = {
 	mode: 'none',
-  entry: './src/console/console.js',
+  entry: [
+    './src/prototyper-web-view/index.html',
+    './src/prototyper-web-view/index.js',
+    './src/prototyper-web-view/index.css',
+    './src/prototyper-web-view/vscode.css',
+  ],
+  
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: 'console.js',
-    libraryTarget: 'global'
+    filename: 'prototyper-web-view.js',
+    libraryTarget: 'global',
+    
   },
   resolve: {
     extensions: ['.js', '.css']
@@ -59,12 +66,19 @@ const consoleConfig = {
   module: {
     rules: [
       {
-        test: /\.js$/,
+        test: /\.html$/,
+        loader: "html-loader",
         exclude: /node_modules/,
       },
       {
-        test: /\.css$/i,
+        test: /\.js$/,
+        exclude: /node_modules/,
+        
+      },
+      {
+        test: /\.css$/,
         use: ['style-loader', 'css-loader'],
+        exclude: /node_modules/
       }
     ]
   },

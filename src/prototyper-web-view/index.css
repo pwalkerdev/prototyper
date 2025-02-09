@@ -4,14 +4,15 @@ body {
 
 .pt-result-container {
 	position: relative;
-    width: 97.5%;
+    width: 100%;
 }
 
 .pt-toolbar {
+	--input-padding-vertical: 6px;
 	display: flex;
 	flex-direction: row-reverse;
 	position: absolute;
-    width: 97.5%;
+    width: 100%;
 	bottom: 4px;
 }
 

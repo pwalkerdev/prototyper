@@ -40,7 +40,7 @@ export function activate(context: vscode.ExtensionContext) {
     );
 
     const provider = new ConsoleViewProvider(context);
-    context.subscriptions.push(vscode.window.registerWebviewViewProvider(ConsoleViewProvider.ViewType, provider));
+    context.subscriptions.push(vscode.window.registerWebviewViewProvider(ConsoleViewProvider.ViewType, provider, { webviewOptions: { retainContextWhenHidden: true }}));
 
     // const transientSourceCodeDebuggerAdapterFactory = new TransientSourceCodeDebugAdapterFactory();
     // const factoryRef = vscode.debug.registerDebugAdapterDescriptorFactory('prototyper-csharp', transientSourceCodeDebuggerAdapterFactory)
