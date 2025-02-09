@@ -39,8 +39,8 @@ export function activate(context: vscode.ExtensionContext) {
         })
     );
 
-    const provider = new ConsoleViewProvider(context.extensionUri);
-    context.subscriptions.push(vscode.window.registerWebviewViewProvider(ConsoleViewProvider.viewType, provider));
+    const provider = new ConsoleViewProvider(context);
+    context.subscriptions.push(vscode.window.registerWebviewViewProvider(ConsoleViewProvider.ViewType, provider));
 
     // const transientSourceCodeDebuggerAdapterFactory = new TransientSourceCodeDebugAdapterFactory();
     // const factoryRef = vscode.debug.registerDebugAdapterDescriptorFactory('prototyper-csharp', transientSourceCodeDebuggerAdapterFactory)

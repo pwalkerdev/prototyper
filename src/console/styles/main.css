@@ -2,39 +2,26 @@ body {
 	background-color: transparent;
 }
 
-.color-list {
-	list-style: none;
-	padding: 0;
+.pt-result-container {
+	position: relative;
+    width: 97.5%;
 }
 
-.color-entry {
-	width: 100%;
+.pt-toolbar {
 	display: flex;
-	margin-bottom: 0.4em;
-	border: 1px solid var(--vscode-input-border);
+	flex-direction: row-reverse;
+	position: absolute;
+    width: 97.5%;
+	bottom: 4px;
 }
 
-.color-preview {
-	width: 2em;
-	height: 2em;
+.pt-button {
+	margin: 0px 4px 0px 4px;
+	width: 16.5%;
 }
-
-.color-preview:hover {
-	outline: inset white;
+.pt-evaluate-button {
+	background-color: darkseagreen;
 }
-
-.color-input {
-	display: block;
-	flex: 1;
-	width: 100%;
-	color: var(--vscode-input-foreground);
-	background-color: var(--vscode-input-background);
-	border: none;
-	padding: 0 0.6em;
-}
-
-.add-color-button {
-	display: block;
-	border: none;
-	margin: 0 auto;
+.pt-debug-button {
+	background-color:  mediumseagreen;
 }
