@@ -1,8 +1,21 @@
 <div class="pt-result-container">
-  <textarea rows="10" readonly="readonly"></textarea>
+  <div class="hidden"></div>
+  <textarea class="hidden" readonly="readonly"></textarea>
+  <h1 class="hidden">Unsupported Language</h1>
 </div>
 
 <div class="pt-toolbar">
-  <button class="pt-button pt-debug-button" id="debug-button">IF YOU SEE THIS SOMETHING WENT WRONG :)</button>
-  <button class="pt-button pt-evaluate-button" id="evaluate-button">IF YOU SEE THIS SOMETHING WENT WRONG :)</button>
+  <div class="hidden flex-column-single-row">
+    <p>Type: </p>
+    <select>
+      <option>Expression</option>
+      <option>Statement</option>
+      <option>Class</option>
+    </select>
+  </div>
+  
+  <div class="right-aligned-div">
+    <button class="pt-button pt-debug-button" id="debug-button">IF YOU SEE THIS SOMETHING WENT WRONG :)</button>
+    <button class="pt-button pt-evaluate-button" id="evaluate-button">IF YOU SEE THIS SOMETHING WENT WRONG :)</button>
+  </div>
 </div>

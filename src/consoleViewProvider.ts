@@ -30,6 +30,8 @@ export class ConsoleViewProvider implements vscode.WebviewViewProvider {
             switch (data.type) {
                 case 'evaluate':
                     break;
+                case 'debug':
+                    break;
             }
         });
 
