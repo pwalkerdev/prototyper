@@ -61,29 +61,34 @@ export class ConsoleViewProvider implements vscode.WebviewViewProvider {
             </html>`;
     }
 
-    private runHeadless(document: vscode.TextDocument, language: string | null): string {
+    private runHeadless(document: vscode.TextDocument, language: string | null) {
         if (!document) {
             return 'Invalid document specified';
         }
 
+        const mode = 'Debug';
         language = language ?? document.languageId.toString();
-        const token: uuid = uuid.new();
-        const implementationScheme: string = 'Method';
-        let result: string = '';
+        const input = 'stream';
+        const token = uuid.new();
+        const implementationScheme = 'Method';
 
-        //const command: string = `cmd.exe /c "${headless.location}" -l ${language} -i stream -t "${token}" --cs-impl-scheme ${implementationScheme}`;
-        const script = 'public int Main() { return 69; }';
-        const command: string = `"${headless.location}" -m Debug -l ${language} -i commandLine -s "${script}" --cs-impl-scheme ${implementationScheme}`;
+        // const script: string = 'public int Main() { return 69; }';
+        // const command: string = `"${headless.location}" -m ${mode} -l ${language} -i commandLine -s "${script}" --cs-impl-scheme ${implementationScheme}`;
 
-        let runner = exec(command, (error, stdout, stderr) => {
-            result = stdout;
-            console.log(`stdout: ${stdout}`);
-            console.error(`stderr: ${stderr}`);
-        });
+        // let runner = exec(command, (error, stdout, stderr) => {
+        //     console.log(`stdout: ${stdout}`);
+        //     console.error(`stderr: ${stderr}`);
+        // });
 
-        //runner.stdin?.setDefaultEncoding('utf8');
+        const command = `"${headless.location}" -m ${mode} -l ${language} -i ${input} -t "${token}" --cs-impl-scheme ${implementationScheme}`;
 
+        let runner = spawn(command);
+        runner.stdin?.setDefaultEncoding('utf8');
+        runner.stdout.pipe(process.stdout);
+        runner.stderr.pipe(process.stderr);
 
-        return result;
+        runner.stdin.write(`${document.getText()}\n`);
+        runner.stdin.write(`${token}\n`);
+        runner.stdin.end();
     }
 }
