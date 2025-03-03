@@ -33,7 +33,7 @@ document.getElementById('debug-button').addEventListener('click', (e) => {
 });
 
 function onStateUpdated(state) {
-    const supportedLanguage = ['csharp', 'javascript', 'typescript'].indexOf(state.activeDocument?.languageId) > -1;
+    const supportedLanguage = ['csharp', 'javascript', 'typescript'].indexOf(state?.activeDocument?.languageId) > -1;
     document.querySelector('body div.pt-result-container div')?.setAttribute('class', supportedLanguage ? '' : 'hidden');
     document.querySelector('body div.pt-result-container textarea')?.setAttribute('class', supportedLanguage ? '' : 'hidden');
     document.querySelector('body div.pt-result-container h1')?.setAttribute('class', supportedLanguage ? 'hidden' : '');
