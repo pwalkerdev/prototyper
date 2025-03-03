@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
-import { nonce } from './global';
+import { exec } from 'node:child_process';
+import { nonce, headless, uuid } from './global';
 
 export class ConsoleViewProvider implements vscode.WebviewViewProvider {
     public static readonly ViewType = 'prototyper.console';
@@ -24,7 +25,7 @@ export class ConsoleViewProvider implements vscode.WebviewViewProvider {
             localResourceRoots: [ this._extensionContext.extensionUri ]
         };
 
-        this._view.webview.html = this._getHtmlForWebview();
+        this._view.webview.html = this.getHtmlForWebview();
 
         this._view.webview.onDidReceiveMessage(data => {
             switch (data.type) {
@@ -41,7 +42,7 @@ export class ConsoleViewProvider implements vscode.WebviewViewProvider {
         this._view.webview.postMessage({ type: 'invalidateState', data: state });
     }
 
-    private _getHtmlForWebview() {
+    private getHtmlForWebview() {
         const scriptUri = this._view?.webview.asWebviewUri(vscode.Uri.joinPath(this._extensionContext.extensionUri, 'dist', 'prototyper-web-view.js'));
         return `
             <!DOCTYPE html>
@@ -57,5 +58,26 @@ export class ConsoleViewProvider implements vscode.WebviewViewProvider {
                     <script nonce="${this._nonce}" src="${scriptUri}"></script>
                 </body>
             </html>`;
+    }
+
+    private runHeadless(document: vscode.TextDocument, language: string | null): string {
+        if (!document) {
+            return 'Invalid document specified';
+        }
+
+        language = language ?? document.languageId.toString();
+        const token: uuid = uuid.new();
+        const implementationScheme: string = 'Method';
+
+        const command: string = `cmd.exe /c "${headless.location}" -l ${language} -i stream -t "${token}" --cs-impl-scheme ${implementationScheme}`;
+        let result: string = '';
+
+        let runner = exec(command, (error, stdout, stderr) => {
+            result = stdout;
+            console.log(`stdout: ${stdout}`);
+            console.error(`stderr: ${stderr}`);
+        });
+
+        return result;
     }
 }
