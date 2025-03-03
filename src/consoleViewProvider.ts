@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { exec } from 'node:child_process';
+import { exec, spawn } from 'node:child_process';
 import { nonce, headless, uuid } from './global';
 
 export class ConsoleViewProvider implements vscode.WebviewViewProvider {
@@ -30,6 +30,7 @@ export class ConsoleViewProvider implements vscode.WebviewViewProvider {
         this._view.webview.onDidReceiveMessage(data => {
             switch (data.type) {
                 case 'evaluate':
+                    this.runHeadless(vscode.window.activeTextEditor!.document, null);
                     break;
                 case 'debug':
                     break;
@@ -68,15 +69,20 @@ export class ConsoleViewProvider implements vscode.WebviewViewProvider {
         language = language ?? document.languageId.toString();
         const token: uuid = uuid.new();
         const implementationScheme: string = 'Method';
-
-        const command: string = `cmd.exe /c "${headless.location}" -l ${language} -i stream -t "${token}" --cs-impl-scheme ${implementationScheme}`;
         let result: string = '';
+
+        //const command: string = `cmd.exe /c "${headless.location}" -l ${language} -i stream -t "${token}" --cs-impl-scheme ${implementationScheme}`;
+        const script = 'public int Main() { return 69; }';
+        const command: string = `"${headless.location}" -m Debug -l ${language} -i commandLine -s "${script}" --cs-impl-scheme ${implementationScheme}`;
 
         let runner = exec(command, (error, stdout, stderr) => {
             result = stdout;
             console.log(`stdout: ${stdout}`);
             console.error(`stderr: ${stderr}`);
         });
+
+        //runner.stdin?.setDefaultEncoding('utf8');
+
 
         return result;
     }

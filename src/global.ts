@@ -11,7 +11,7 @@ export class instance {
 export class headless {
     private static readonly _searchPath: string[] = instance.isDebug ? ['.modules', 'Headless', 'Headless', 'bin', 'Debug', 'net8.0'] : ['dist', 'bin'];
 
-    static readonly location: string = vscode.Uri.file(path.join(instance.installationFolder, ...this._searchPath, 'Headless.exe')).fsPath;
+    static readonly location: string = vscode.Uri.file(path.join(instance.installationFolder, ...this._searchPath, 'Headless')).fsPath;
 
     static readonly debugConfiguration: vscode.DebugConfiguration = {
         name: '.NET Core Attach',
