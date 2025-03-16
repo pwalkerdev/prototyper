@@ -11,7 +11,10 @@ export class instance {
 export class headless {
     private static readonly _searchPath: string[] = instance.isDebug ? ['.modules', 'Headless', 'Headless', 'bin', 'Debug', 'net8.0'] : ['dist', 'bin'];
 
-    static readonly location: string = vscode.Uri.file(path.join(instance.installationFolder, ...this._searchPath, 'Headless')).fsPath;
+    // TODO - refactor this file & containing classes. it is starting to get messy in here
+    static readonly directory: string = vscode.Uri.file(path.join(instance.installationFolder, ...this._searchPath)).fsPath;
+    static readonly fileName: string = /^win/.test(process.platform) ? 'Headless.exe' : 'Headless';
+    static readonly location: string = vscode.Uri.file(path.join(this.directory, this.fileName)).fsPath;
 
     static readonly debugConfiguration: vscode.DebugConfiguration = {
         name: '.NET Core Attach',

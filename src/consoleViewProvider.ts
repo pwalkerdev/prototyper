@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { exec, spawn } from 'node:child_process';
+import { ChildProcess, exec, spawn } from 'node:child_process';
 import { nonce, headless, uuid } from './global';
 
 export class ConsoleViewProvider implements vscode.WebviewViewProvider {
@@ -80,15 +80,30 @@ export class ConsoleViewProvider implements vscode.WebviewViewProvider {
         //     console.error(`stderr: ${stderr}`);
         // });
 
-        const command = `"${headless.location}" -m ${mode} -l ${language} -i ${input} -t "${token}" --cs-impl-scheme ${implementationScheme}`;
+        const command = `./${headless.fileName}`;
+        const args = [
+            '-m', `${mode}`,
+            '-l', `${language}`,
+            '-i', `${input}`,
+            '-t', `${token}`,
+            '--cs-impl-scheme', `${implementationScheme}`
+        ];
+        const directory = `${headless.directory}`;
 
-        let runner = spawn(command);
-        runner.stdin?.setDefaultEncoding('utf8');
-        runner.stdout.pipe(process.stdout);
-        runner.stderr.pipe(process.stderr);
+        let runner = spawn(command, args, {
+            cwd: directory
+        }).on('spawn', (proc: any) => {
+            console.log('yipee');
 
-        runner.stdin.write(`${document.getText()}\n`);
-        runner.stdin.write(`${token}\n`);
-        runner.stdin.end();
+            runner.stdin?.setDefaultEncoding('utf8');
+            runner.stdout.pipe(process.stdout);
+            runner.stderr.pipe(process.stderr);
+
+            runner.stdin.write(`${document.getText()}\n`);
+            runner.stdin.write(`${token}\n`);
+            runner.stdin.end();
+        }).on('error', (err) => {
+            console.error('fuck');
+        });
     }
 }
