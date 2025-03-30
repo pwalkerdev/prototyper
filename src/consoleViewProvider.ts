@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { ChildProcess, exec, spawn } from 'node:child_process';
+import { spawn } from 'node:child_process';
 import { nonce, headless, uuid } from './global';
 
 export class ConsoleViewProvider implements vscode.WebviewViewProvider {
@@ -20,27 +20,20 @@ export class ConsoleViewProvider implements vscode.WebviewViewProvider {
         this._view = webviewView;
         this._viewContext = context;
 
-        this._view.webview.options = {
-            enableScripts: true,
-            localResourceRoots: [ this._extensionContext.extensionUri ]
-        };
+        this._view.webview.options = { enableScripts: true, localResourceRoots: [ this._extensionContext.extensionUri ] };
 
         this._view.webview.html = this.getHtmlForWebview();
 
         this._view.webview.onDidReceiveMessage(data => {
             switch (data.type) {
                 case 'evaluate':
-                    this.runHeadless(vscode.window.activeTextEditor!.document, null);
-                    break;
                 case 'debug':
+                    this.runHeadless(vscode.window.activeTextEditor!.document, data.type);
                     break;
             }
         });
 
-        const state = {
-            activeDocument: vscode.window.activeTextEditor?.document
-        };
-        this._view.webview.postMessage({ type: 'invalidateState', data: state });
+        this._view.webview.postMessage({ type: 'activeDocumentChanged', data: vscode.window.activeTextEditor?.document });
     }
 
     private getHtmlForWebview() {
@@ -61,49 +54,41 @@ export class ConsoleViewProvider implements vscode.WebviewViewProvider {
             </html>`;
     }
 
-    private runHeadless(document: vscode.TextDocument, language: string | null) {
+    private runHeadless(document: vscode.TextDocument, mode: string, language: string | null = null) {
         if (!document) {
             return 'Invalid document specified';
         }
-
-        const mode = 'Debug';
-        language = language ?? document.languageId.toString();
+        
         const input = 'stream';
         const token = uuid.new();
         const implementationScheme = 'Method';
 
-        // const script: string = 'public int Main() { return 69; }';
-        // const command: string = `"${headless.location}" -m ${mode} -l ${language} -i commandLine -s "${script}" --cs-impl-scheme ${implementationScheme}`;
-
-        // let runner = exec(command, (error, stdout, stderr) => {
-        //     console.log(`stdout: ${stdout}`);
-        //     console.error(`stderr: ${stderr}`);
-        // });
-
         const command = `./${headless.fileName}`;
         const args = [
             '-m', `${mode}`,
-            '-l', `${language}`,
+            '-l', `${language ?? document.languageId.toString()}`,
             '-i', `${input}`,
             '-t', `${token}`,
             '--cs-impl-scheme', `${implementationScheme}`
         ];
         const directory = `${headless.directory}`;
 
-        let runner = spawn(command, args, {
-            cwd: directory
-        }).on('spawn', (proc: any) => {
-            console.log('yipee');
+        let runner = spawn(command, args, { cwd: directory })
+            .on('spawn', () => {
+                this._view?.webview.postMessage({ type: 'headlessSpawned', data: { token, fileName: document.fileName } });
 
-            runner.stdin?.setDefaultEncoding('utf8');
-            runner.stdout.pipe(process.stdout);
-            runner.stderr.pipe(process.stderr);
+                runner.stdout.on('data', (chunk) => this._view?.webview.postMessage({ type: 'headlessOutput', data: { type: 'stdout', token, buffer: Buffer.from(chunk).toString('utf8') } }));
+                runner.stderr.on('data', (chunk) => this._view?.webview.postMessage({ type: 'headlessOutput', data: { type: 'stderr', token, buffer: Buffer.from(chunk).toString('utf8') } }));
 
-            runner.stdin.write(`${document.getText()}\n`);
-            runner.stdin.write(`${token}\n`);
-            runner.stdin.end();
-        }).on('error', (err) => {
-            console.error('fuck');
-        });
+                runner.stdin?.setDefaultEncoding('utf8');
+                runner.stdin.write(`${document.getText()}\n${token}\n`);
+                runner.stdin.end();
+            })
+            .on('close', async (exitCode: number, exitSignal: string) => {
+                this._view?.webview.postMessage({ type: 'headlessExited', data: { token, exitCode, exitSignal } });
+            })
+            .on('error', (err) => {
+                console.error('fuck', err);
+            });
     }
 }
