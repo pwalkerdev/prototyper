@@ -1,6 +1,8 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 
+// TODO - refactor this file. it is starting to get messy in here
+
 export class instance {
     static readonly isDebug: boolean = process.env.IsDebugInstance === 'true';
     static readonly installationFolder: string = vscode.extensions.getExtension('pwalkerdev.prototyper')?.extensionPath ?? '';
@@ -11,7 +13,6 @@ export class instance {
 export class headless {
     private static readonly _searchPath: string[] = instance.isDebug ? ['.modules', 'Headless', 'Headless', 'bin', 'Debug', 'net8.0'] : ['dist', 'bin'];
 
-    // TODO - refactor this file & containing classes. it is starting to get messy in here
     static readonly directory: string = vscode.Uri.file(path.join(instance.installationFolder, ...this._searchPath)).fsPath;
     static readonly fileName: string = /^win/.test(process.platform) ? 'Headless.exe' : 'Headless';
     static readonly location: string = vscode.Uri.file(path.join(this.directory, this.fileName)).fsPath;
@@ -32,7 +33,7 @@ export class headless {
         //         includeSymbolsNextToModules: true
         //     }
         // }
-        
+
     };
 }
 
@@ -47,7 +48,7 @@ export class nonce {
 export class prototerminal {
     static readonly name: string = 'Headless Dotnet Script';
     static readonly welcomeMessage: string = 'Prototyper: Initialising Terminal Instance...\r\n';
-    
+
     static readonly options: vscode.TerminalOptions = {
         name: this.name,
         message: this.welcomeMessage,
@@ -55,3 +56,15 @@ export class prototerminal {
         cwd: vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders?.length > 0 ? vscode.workspace.workspaceFolders![0].uri : undefined,
     };
 }
+
+declare global {
+  interface String {
+    toFriendlyName(): string;
+  }
+}
+
+String.prototype.toFriendlyName = function (): string {
+  return this
+    .replace(/^./, char => char.toUpperCase()) // Capitalize the first character
+    .replace(/([a-z])([A-Z])/g, '$1 $2'); // Adds space before uppercase letters
+};

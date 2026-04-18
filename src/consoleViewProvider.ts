@@ -26,7 +26,7 @@ export class ConsoleViewProvider implements vscode.WebviewViewProvider {
 
         this._view.webview.onDidReceiveMessage(data => {
             switch (data.type) {
-                case 'evaluate':
+                case 'compileAndInvoke':
                 case 'debug':
                     this.runHeadless(vscode.window.activeTextEditor!.document, data.type);
                     break;
@@ -58,7 +58,7 @@ export class ConsoleViewProvider implements vscode.WebviewViewProvider {
         if (!document) {
             return 'Invalid document specified';
         }
-        
+
         const input = 'stream';
         const token = uuid.new();
         const implementationScheme = 'Method';
@@ -75,7 +75,7 @@ export class ConsoleViewProvider implements vscode.WebviewViewProvider {
 
         let runner = spawn(command, args, { cwd: directory })
             .on('spawn', () => {
-                this._view?.webview.postMessage({ type: 'headlessSpawned', data: { token, fileName: document.fileName } });
+                this._view?.webview.postMessage({ type: 'headlessSpawned', data: { token, fileName: document.fileName, mode: mode.toFriendlyName() } });
 
                 runner.stdout.on('data', (chunk) => this._view?.webview.postMessage({ type: 'headlessOutput', data: { type: 'stdout', token, buffer: Buffer.from(chunk).toString('utf8') } }));
                 runner.stderr.on('data', (chunk) => this._view?.webview.postMessage({ type: 'headlessOutput', data: { type: 'stderr', token, buffer: Buffer.from(chunk).toString('utf8') } }));

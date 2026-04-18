@@ -3,6 +3,7 @@ import { headless, instance, uuid, prototerminal } from './global';
 // import { TransientSourceCodeDebugAdapterFactory } from './transientSourceCodeDebugAdapter';
 import { MemFS } from './fileSystemProvider';
 import { ConsoleViewProvider } from './consoleViewProvider';
+import { setTimeout } from 'node:timers';
 
 export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(vscode.workspace.registerFileSystemProvider('prototypewriter', new MemFS(), { isCaseSensitive: true }));
@@ -17,7 +18,7 @@ export function activate(context: vscode.ExtensionContext) {
             const regex = /prototypewriter:((\/?\/?\/)|(\\?\\?\\))[-a-zA-Z0-9@:%._\+\\~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+\\.~#?&//]*)((=| )?[0-9]*)/;
             const matches = (context.line as string)?.match(regex);
 
-            return !!matches?.index 
+            return !!matches?.index
                 ? matches
                     .filter((m: any) => { return !!m?.startsWith('prototypewriter'); })
                     .map((m: any) => {
@@ -88,7 +89,7 @@ function Evaluate(languageOverride: string): void {
         const token = uuid.new(),
               delay = instance.determineTerminalInitialisationDelay(prototerminal.name), // HACK: This is pretty crappy but if we create a new terminal then we have to wait until it is ready. I couldn't find a 'proper' way to do this
               terminal = vscode.window.terminals.find(t => t.name === prototerminal.name) ?? vscode.window.createTerminal(prototerminal.options);
-        
+
         // TODO: the addition of the --cs-impl-scheme param is a hack because I plan to improve the C# compiler and remove this later. The JS compiler will ignore this param
         terminal.sendText(`cmd.exe /c "${headless.location}" -l ${languageOverride ?? document.languageId} -i stream -t "${token}" --cs-impl-scheme Method`);
 
@@ -130,10 +131,10 @@ function Debug(language: string): void {
             setTimeout(() => {
                 vscode.debug.startDebugging(undefined, headless.debugConfiguration, undefined).then(_ => {
                     terminal.sendText(document.getText());
-                    terminal.sendText(token); // Resending the token indicates to the script interpreter that there is no more to send 
+                    terminal.sendText(token); // Resending the token indicates to the script interpreter that there is no more to send
                 });
             }, delay);
-        
+
             terminal.show(true);
         });
     }

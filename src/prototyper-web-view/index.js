@@ -26,7 +26,7 @@ window.addEventListener('message', ({ data: message }) => {
 
 document.getElementById('evaluate-button').addEventListener('click', (e) => {
     console.info('evaluate button clicked', e);
-    vscode.postMessage({ type: 'evaluate' });
+    vscode.postMessage({ type: 'compileAndInvoke' });
 });
 
 document.getElementById('debug-button').addEventListener('click', (e) => {
@@ -63,7 +63,7 @@ function onTreeViewParentClicked(e) {
 
 function onHeadlessSpawned(instanceInfo) {
     const parent = createElement(document.getElementById('output'), 'li', { id: `output-${instanceInfo.token}`, className: 'pt-tree-view' });
-    const topLevelHeading = createElement(parent, 'h1', { className: 'pt-tree-view-parent pt-tree-view-parent-expanded', innerHTML: `${new Date().toLocaleTimeString().split(' ')[0]} - Evaluate ${instanceInfo.fileName}` });
+    const topLevelHeading = createElement(parent, 'h1', { className: 'pt-tree-view-parent pt-tree-view-parent-expanded', innerHTML: `${new Date().toLocaleTimeString().split(' ')[0]} - ${instanceInfo.mode} "${instanceInfo.fileName}"` });
     topLevelHeading.addEventListener('click', onTreeViewParentClicked);
     createElement(parent, 'ul', { className: 'pt-tree-view' });
 
