@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { spawn } from 'node:child_process';
-import { nonce, headless, uuid } from './global';
+import { nonce, headless, uuid } from '../global';
 
 export class ConsoleViewProvider implements vscode.WebviewViewProvider {
     public static readonly ViewType = 'prototyper.console';

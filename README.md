@@ -2,7 +2,7 @@
 
 Compile and run whatever is in the currently selected editor!
 
-[<img src="src/images/conventional-example.gif" width="600" height="420" alt="Prototyper Demo" />](src/images/conventional-example.gif)
+[<img src="assets/images/readme/conventional-example.gif" width="600" height="420" alt="Prototyper Demo" />](assets/images/readme/conventional-example.gif)
 
 Curently only C# is supported. JavaScript and other languages will be added in future releases, once they are supported by Headless.
 
@@ -76,7 +76,7 @@ No functional changes, just small modifications to the readme.
 
 ### 0.0.1
 
-Initial release of prototyper! This project is in it's infancy and very much still a work in progress. The current release contains little more than the bare minimum. Only C# is supported and scripts cannot be run concurently. Scripts must be written in a specific way (see notes above) to be interpreted correctly by headless.  
+Initial release of prototyper! This project is in it's infancy and very much still a work in progress. The current release contains little more than the bare minimum. Only C# is supported and scripts cannot be run concurently. Scripts must be written in a specific way (see notes above) to be interpreted correctly by headless.
 All of this will be improved upon in future iterations.
 
 ## License
@@ -84,7 +84,7 @@ All of this will be improved upon in future iterations.
 This project is licensed under the GNU GPLv3 License - see the LICENSE.md file for details
 
 ---
-  
+
 <p align="center">
   Written by Paul Walker - github.com/pwalkerdev
 </p>
