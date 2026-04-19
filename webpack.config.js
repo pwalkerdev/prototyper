@@ -48,17 +48,17 @@ const extensionConfig = {
 const consoleConfig = {
 	mode: 'none',
   entry: [
-    './src/prototyper-web-view/index.html',
-    './src/prototyper-web-view/index.js',
-    './src/prototyper-web-view/index.css',
-    './src/prototyper-web-view/vscode.css',
+    './src/views/prototyper-web-view/index.html',
+    './src/views/prototyper-web-view/index.js',
+    './src/views/prototyper-web-view/index.css',
+    './src/views/prototyper-web-view/vscode.css',
   ],
-  
+
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: 'prototyper-web-view.js',
     libraryTarget: 'global',
-    
+
   },
   resolve: {
     extensions: ['.js', '.css']
@@ -73,7 +73,7 @@ const consoleConfig = {
       {
         test: /\.js$/,
         exclude: /node_modules/,
-        
+
       },
       {
         test: /\.css$/,
