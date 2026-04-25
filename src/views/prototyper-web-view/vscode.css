@@ -11,8 +11,8 @@ body {
 	font-family: var(--vscode-font-family);
 }
 
-body > *,
-form > * {
+body>*,
+form>* {
 	margin-block-start: var(--input-margin-vertical);
 	margin-block-end: var(--input-margin-vertical);
 }
@@ -80,3 +80,47 @@ input::placeholder,
 textarea::placeholder {
 	color: var(--vscode-input-placeholderForeground);
 }
+
+.view-lines {
+	font-family: Consolas, "Courier New", monospace;
+	font-weight: normal;
+	font-size: 14px;
+	font-feature-settings: "liga" 0, "calt" 0;
+	font-variation-settings: normal;
+	line-height: 19px;
+	letter-spacing: 0px;
+}
+
+.view-line {
+	top: 38px;
+	height: 19px;
+	line-height: 19px;
+}
+
+.mtk1 { color: #cccccc; }
+.mtk2 { color: #1f1f1f; }
+.mtk3, .verbose, .debug { color: #d4d4d4; }
+.mtk4 { color: #000080; }
+.mtk5 { color: #6a9955; }
+.mtk6 { color: #569cd6; }
+.mtk7, .information { color: #b5cea8; }
+.mtk8 { color: #646695; }
+.mtk9, .warning { color: #d7ba7d; }
+.mtk10 { color: #9cdcfe; }
+.mtk11, .fatal { color: #f44747; }
+.mtk12 { color: #c586c0; }
+.mtk13 { color: #ce9178; }
+.mtk14 { color: #6796e6; }
+.mtk15 { color: #808080; }
+.mtk16, .error { color: #d16969; }
+.mtk17 { color: #dcdcaa; }
+.mtk18 { color: #4ec9b0; }
+.mtk19 { color: #4fc1ff; }
+.mtk20 { color: #c8c8c8; }
+.mtk21 { color: #cd9731; }
+.mtk22 { color: #b267e6; }
+.mtki { font-style: italic; }
+.mtkb, .error, .fatal { font-weight: bold; }
+.mtku { text-decoration: underline; text-underline-position: under; }
+.mtks { text-decoration: line-through; }
+.mtks.mtku { text-decoration: underline line-through; text-underline-position: under; }

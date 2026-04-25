@@ -50,8 +50,14 @@ export class ConsoleViewProvider implements vscode.WebviewViewProvider {
             <html lang="en">
                 <head>
                     <meta charset="UTF-8">
-                    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${this._view?.webview.cspSource} 'nonce-${this._nonce}'; script-src 'nonce-${this._nonce}';">
                     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <meta
+                        http-equiv="Content-Security-Policy"
+                        content="default-src 'self';
+                                 connect-src ${this._view?.webview.cspSource} 'nonce-${this._nonce}';
+                                 style-src ${this._view?.webview.cspSource} 'nonce-${this._nonce}';
+                                 script-src 'nonce-${this._nonce}';"
+                    >
 
                     <title>Prototyper: Console</title>
                 </head>

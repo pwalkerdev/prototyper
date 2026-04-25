@@ -34,8 +34,6 @@ p {
     flex-wrap: wrap;
     flex-grow: 1;
     padding: 1px;
-    align-items: center;
-    justify-content: space-around;
 }
 .pt-result-container textarea {
     width: 100%;

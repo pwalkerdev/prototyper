@@ -6,7 +6,7 @@ document.body.setHTMLUnsafe(`${html.default}\r\n${document.body.innerHTML}`);
 const vscode = acquireVsCodeApi();
 
 window.addEventListener('message', ({ data: message }) => {
-    console.info(`message: ${message.type} recevied`, message.data);
+    console.trace(`message: ${message.type} recevied`, message.data);
 
     switch (message.type) {
         case 'activeDocumentChanged':
@@ -16,7 +16,7 @@ window.addEventListener('message', ({ data: message }) => {
             onHeadlessSpawned(message.data);
             break;
         case 'headlessExited':
-            // todo
+            onHeadlessExited(message.data);
             break;
         case 'headlessOutput':
             onHeadlessOutput(message.data);
@@ -25,19 +25,16 @@ window.addEventListener('message', ({ data: message }) => {
 });
 
 document.getElementById('evaluate-button').addEventListener('click', (e) => {
-    console.info('evaluate button clicked', e);
     vscode.postMessage({ type: 'compileAndInvoke' });
 });
 
 document.getElementById('debug-button').addEventListener('click', (e) => {
-    console.info('debug button clicked', e);
     vscode.postMessage({ type: 'debug' });
 });
 
 function onActiveDocumentChanged(activeDocument) {
     const supportedLanguage = ['csharp', 'javascript', 'typescript'].indexOf(activeDocument?.languageId) > -1;
-    document.querySelector('body div.pt-result-container div')?.setAttribute('class', supportedLanguage ? '' : 'hidden');
-    document.getElementById('output')?.setAttribute('class', supportedLanguage ? '' : 'hidden');
+    document.querySelector('body div.pt-result-container div')?.setAttribute('class', supportedLanguage ? 'view-lines' : 'hidden');
     document.querySelector('body div.pt-result-container h1')?.setAttribute('class', supportedLanguage ? 'hidden' : '');
     document.querySelector('body div.pt-toolbar')?.setAttribute('class', supportedLanguage ? 'pt-toolbar' : 'hidden pt-toolbar');
 
@@ -56,17 +53,7 @@ function createElement(parent, type, configurator) {
     return result;
 }
 
-function onTreeViewParentClicked(e) {
-    e.target.parentElement.querySelector('ul')?.classList.toggle('hidden');
-    e.target.parentElement.querySelector('.pt-tree-view-parent')?.classList.toggle('pt-tree-view-parent-expanded');
-}
-
 function onHeadlessSpawned(instanceInfo) {
-    const parent = createElement(document.getElementById('output'), 'li', { id: `output-${instanceInfo.token}`, className: 'pt-tree-view' });
-    const topLevelHeading = createElement(parent, 'h1', { className: 'pt-tree-view-parent pt-tree-view-parent-expanded', innerHTML: `${new Date().toLocaleTimeString().split(' ')[0]} - ${instanceInfo.mode} "${instanceInfo.fileName}"` });
-    topLevelHeading.addEventListener('click', onTreeViewParentClicked);
-    createElement(parent, 'ul', { className: 'pt-tree-view' });
-
     const state = vscode.getState();
     state.headlessInstances = !!state.headlessInstances.set ? state.headlessInstances : new Map();
     state.headlessInstances.set(instanceInfo.token, instanceInfo);
@@ -74,10 +61,36 @@ function onHeadlessSpawned(instanceInfo) {
     vscode.setState(state);
 }
 
-function onHeadlessOutput(output) {
-    const types = document.querySelector(`#output-${output.token} ul`);
-    const type = types.querySelector(`#heading-${output.type}-${output.token}`) ?? createElement(types, 'li', { id: `heading-${output.type}-${output.token}`, className: 'pt-tree-view' });
-    const lines = type.querySelector('ul') ?? createElement(type, 'ul', { id: `${output.type}-${output.token}`, className: 'pt-tree-view' });
+function onHeadlessExited(instanceInfo) {
+    const lineElement = createElement(document.getElementById('output'), 'div', { className: `view-line` });
+    const spanElement = createElement(lineElement, 'span',  {});
+    createElement(spanElement, 'span', { className: 'mtk5', innerHTML: '---' });
+}
 
-    output.buffer.split('\n').filter(b => b.trim().length).map(b => createElement(lines, 'h3', { className: `pt-tree-view ${output.type}` }).innerHTML = b.trim());
+function onHeadlessOutput(output) {
+    output.buffer
+        .split('\n')
+        .filter(b => b.trim().length)
+        .map((b) => {
+            const segments = b.split(' ').filter(c => c.trim().length);
+            const lineElement = createElement(document.getElementById('output') , 'div', { className: `view-line` });
+            const spanElement = createElement(lineElement, 'span',  {});
+
+            // YUCKY: this is a pretty crappy way to split out the log message template from any subsequent log lines but it works and it is all im gonna do for now so cringe away
+            if (new Date(segments[0]).toString() !== 'Invalid Date' && segments.length > 3) {
+                const level = segments[2].substring(1, segments[2].length - 1).toLowerCase();
+                createElement(spanElement, 'span', { className: 'mtk5', innerHTML: segments[0] });
+                createElement(spanElement, 'span', { className: 'mtk1', innerHTML: '&nbsp;' });
+                createElement(spanElement, 'span', { className: 'mtk5', innerHTML: segments[1] });
+                createElement(spanElement, 'span', { className: 'mtk1', innerHTML: '&nbsp;' });
+                createElement(spanElement, 'span', { className: `${level} 69420`, innerHTML: segments[2] });
+                createElement(spanElement, 'span', { className: 'mtk1', innerHTML: '&nbsp;' });
+                createElement(spanElement, 'span', { className: 'mtk1', innerHTML: segments.slice(3).join(' ') });
+            } else {
+                const levels = document.querySelectorAll('.view-lines .view-line span span[class~="69420"]');
+                createElement(spanElement, 'span', { className: 'mtk1', innerHTML: '&nbsp;' });
+                createElement(spanElement, 'span', { className: 'mtk1', innerHTML: '&nbsp;' });
+                createElement(spanElement, 'span', { className: levels[levels.length - 1].className, innerHTML: b });
+            }
+        });
 }
