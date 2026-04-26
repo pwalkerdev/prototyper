@@ -18,11 +18,13 @@ export function runHeadless(document: vscode.TextDocument, messageProcessor: hea
 
     const command = `./${headless.fileName}`;
     const args = [
-        '-m', `${mode}`,
-        '-l', `${language ?? document.languageId.toString()}`,
-        '-i', `${input}`,
-        '-t', `${token}`,
-        '--cs-impl-scheme', `${implementationScheme}`
+        '-m', mode,
+        '-l', language ?? document.languageId.toString(),
+        '-i', input,
+        '-t', token,
+        '--cs-impl-scheme', implementationScheme,
+        //'--cs-file-name', document.isUntitled ? document.fileName : document.uri.toString(true)
+        '--cs-file-name', document.fileName
     ];
     const directory = `${headless.directory}`;
 
